@@ -19,6 +19,7 @@ int APS5_VABI pthread_attr_getscope_nid_postfix(void* const* attr, int* scope);
 int APS5_VABI pthread_attr_setscope_nid_postfix(void** attr, int scope);
 int APS5_VABI pthread_atfork_nid_postfix(void (APS5_VABI* prepare)(), void (APS5_VABI* parent)(), void (APS5_VABI* child)());
 int APS5_VABI msync_nid_postfix(void* address, std::size_t length, int flags);
+int APS5_VABI getlogin_r_nid_postfix(char* output, int size);
 }
 
 namespace {
@@ -116,9 +117,14 @@ int APS5_VABI getfsstat_nid_postfix(void) {
     return 0;
 }
 
-int APS5_VABI getlogin_nid_postfix(void) {
-    NotImplemented_nid_no_patch(__func__);
-    return 0;
+char* APS5_VABI getlogin_nid_postfix(void) {
+    static char name[33];
+    const int error = getlogin_r_nid_postfix(name, sizeof(name));
+    if (error != 0) {
+        *__error_nid_postfix() = error;
+        return nullptr;
+    }
+    return name[0] != '\0' ? name : nullptr;
 }
 
 int APS5_VABI ipmimgr_call_nid_postfix(void) {
