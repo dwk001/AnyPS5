@@ -227,9 +227,8 @@ int APS5_VABI sceSystemGestureGetTouchEventByEventID(int32_t gestureHandle, cons
     std::lock_guard lock(primitiveTouchMutex);
     if (!gestureInitialized) return static_cast<int>(0x80890003);
     (void)eventId;
-    (void)event;
     if (!findGestureContext(gestureHandle)) return SCE_SYSTEM_GESTURE_ERROR_INVALID_HANDLE;
-    if (!recognizer) return SCE_SYSTEM_GESTURE_ERROR_INVALID_ARGUMENT;
+    if (!recognizer || !event) return SCE_SYSTEM_GESTURE_ERROR_INVALID_ARGUMENT;
     return SCE_SYSTEM_GESTURE_ERROR_INDEX_OUT_OF_ARRAY;
 }
 
@@ -237,20 +236,16 @@ int APS5_VABI sceSystemGestureGetTouchEventByIndex(int32_t gestureHandle, const 
     std::lock_guard lock(primitiveTouchMutex);
     if (!gestureInitialized) return static_cast<int>(0x80890003);
     (void)index;
-    (void)event;
     if (!findGestureContext(gestureHandle)) return SCE_SYSTEM_GESTURE_ERROR_INVALID_HANDLE;
-    if (!recognizer) return SCE_SYSTEM_GESTURE_ERROR_INVALID_ARGUMENT;
+    if (!recognizer || !event) return SCE_SYSTEM_GESTURE_ERROR_INVALID_ARGUMENT;
     return SCE_SYSTEM_GESTURE_ERROR_INDEX_OUT_OF_ARRAY;
 }
 
 int APS5_VABI sceSystemGestureGetTouchEvents(int32_t gestureHandle, const SystemGestureTouchRecognizer* recognizer, SystemGestureTouchEvent* eventBuffer, uint32_t capacityOfBuffer, uint32_t* numberOfEvent) {
     std::lock_guard lock(primitiveTouchMutex);
     if (!gestureInitialized) return static_cast<int>(0x80890003);
-    (void)recognizer;
-    (void)eventBuffer;
-    (void)capacityOfBuffer;
     if (!findGestureContext(gestureHandle)) return SCE_SYSTEM_GESTURE_ERROR_INVALID_HANDLE;
-    if (!numberOfEvent) return SCE_SYSTEM_GESTURE_ERROR_INVALID_ARGUMENT;
+    if (!recognizer || !eventBuffer || !capacityOfBuffer || !numberOfEvent) return SCE_SYSTEM_GESTURE_ERROR_INVALID_ARGUMENT;
     *numberOfEvent = 0;
     return 0;
 }
@@ -258,8 +253,9 @@ int APS5_VABI sceSystemGestureGetTouchEvents(int32_t gestureHandle, const System
 int APS5_VABI sceSystemGestureGetTouchEventsCount(int32_t gestureHandle, const SystemGestureTouchRecognizer* recognizer) {
     std::lock_guard lock(primitiveTouchMutex);
     if (!gestureInitialized) return static_cast<int>(0x80890003);
-    (void)recognizer;
-    return findGestureContext(gestureHandle) != nullptr ? 0 : SCE_SYSTEM_GESTURE_ERROR_INVALID_HANDLE;
+    if (!findGestureContext(gestureHandle)) return SCE_SYSTEM_GESTURE_ERROR_INVALID_HANDLE;
+    if (!recognizer) return SCE_SYSTEM_GESTURE_ERROR_INVALID_ARGUMENT;
+    return 0;
 }
 
 int APS5_VABI sceSystemGestureGetTouchRecognizerInformation(int32_t gestureHandle, const SystemGestureTouchRecognizer* recognizer, SystemGestureTouchRecognizerInformation* information) {
